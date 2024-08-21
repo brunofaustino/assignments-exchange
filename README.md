@@ -8,9 +8,8 @@
 After clone this repository, you can run the following commands to start the database.
 
 ```sh
-docker run --name postgresbrndb -v $(pwd)/data:/data -e POSTGRES_PASSWORD=postgres -p 5432:5432 -d postgres 
+docker-compose up db 
 ```
-
 ## Running
 
 The main sql scripts are: [assignment_1.sql](assignment_1.sql) and [assignment_2.sql](assignment_2.sql).
@@ -27,20 +26,6 @@ But you can also run the following to see some main outputs:
 
 ```sh
  PGPASSWORD='postgres' psql -h localhost -p 5432 -U postgres -d postgres -P pager=off -f assignment_2.sql
-```
-
-## Introduction
-
-After the database is up and running, in the same directory, 
-you can run the following commands.
-
-```sql
-PGPASSWORD='postgres' psql -h localhost -p 5432 -U postgres -d postgres -f assignment_1.sql
-```
-
-Checking table results
-```sh
-PGPASSWORD='postgres' psql -h localhost -p 5432 -U postgres -d postgres -c "SELECT * FROM currency_conversion_f LIMIT 5;"
 ```
 
 # Outputs
@@ -124,4 +109,73 @@ Marking new purchases
 Calculating the total revenue for active products on 01/10/2019
 
 ![revenue.png](img/assisgnment_2/revenue.png)
+
+## Bonus
+
+I have alse created an API with two endpoints, one to get the exchange rate for 
+a specific date (```GET/exchange_rates```), source currency, and destination currency, 
+and another to insert a new exchange rate (```POST/exchange_rates```).
+
+
+Starting DB
+```sh
+docker-compose up db --build
+```
+
+Make sure you have ingested the data:
+
+```sh
+PGPASSWORD='postgres' psql -h localhost -p 5432 -U postgres -d postgres -P pager=off -f assignment_1.sql
+```
+
+Starting API
+
+```sh
+docker-compose up api
+```
+
+**WARNING: if you are using Apple Silicon, run this instead**:
+
+```sh
+DOCKER_DEFAULT_PLATFORM=linux/amd64 docker-compose up api --build
+```
+
+Get the exchange rates for a specific date, source currency, and destination currency
+
+```sh
+curl -s -X GET "http://127.0.0.1:8000/exchange_rates/?conversion_date=2019-12-05&source_currency_key=26&destination_currency_key=72"
+```
+
+Output:
+![api_get_exchange_rate.png](img/assisgnment_1/api_get_exchange_rate.png)
+
+```sh
+curl -s -X POST "http://127.0.0.1:8000/exchange_rates/" -H "Content-Type: application/json" -d '{
+    "conversion_date": "2024-08-21",
+    "source_currency_key": 26,
+    "destination_currency_key": 72,
+    "source_destination_exchrate": 0.85
+}'
+```
+
+Output:
+
+![api_post_exchange_rate.png](img/assisgnment_1/api_post_exchange_rate.png)
+
+To stop all
+
+```sh
+docker-compose down
+```
+
+## Cleaning up
+
+```sh
+docker-compose down
+```
+
+```sh
+docker rm assignmentsexchangeapi postgresbrndb --force
+docker rmi assignmentsexchangeapi postgres 
+```
 
