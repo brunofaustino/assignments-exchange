@@ -75,25 +75,29 @@ FROM '/data/currency_conversion_f.csv' DELIMITER ',' CSV HEADER;
 
 Saving data in all formats present in currency_conversion_F:
 
-![img/assisgnment_1/all_formats.png](img/assisgnment_1/all_formats.png)
+
+<img src="img/assisgnment_1/all_formats.png" alt="all_formats" style="width:60%;height:60%;"/>
 
 Simulating the insertion of data from an external application, 
 and exchange rates from pound to €, and from $ to € (GBP->EUR e USD-> EUR)
 
-![insert_external_app.png](img/assisgnment_1/insert_external_app.png)
+<img src="img/assisgnment_1/insert_external_app.png" alt="insert_external_app" style="width:60%;height:60%;"/>
+
 
 Given an amount, a date, and the pair (currency 1, currency 2), converts amount from currency 1
 to currency 2, using the exchange rate, which is closer in time to date, independently if closer in
 the past or in the future.
 
-![convert_currency.png](img/assisgnment_1/convert_currency.png)
+<img src="img/assisgnment_1/convert_currency.png" alt="convert_currency" style="width:60%;height:60%;"/>
+
 
 In presence of DML operations on currency_conversion_F, updates mean monthly and mean yearly values of
 exchange rates wherever present.
 
-![month_avg.png](img/assisgnment_1/month_avg.png)
+<img src="img/assisgnment_1/month_avg.png" alt="year_avg" style="width:60%;height:60%;"/>
 
-![year_avg.png](img/assisgnment_1/year_avg.png)
+<img src="img/assisgnment_1/year_avg.png" alt="year_avg" style="width:60%;height:60%;"/>
+
 
 ## Assignment 2
 
@@ -101,15 +105,15 @@ Despite I found some high percentage of matching, I was not able to find a relat
 creating PRIMARY KEYS and FOREIGN KEYS. I tried to insert the data into the tables, but all the combinations
 broke the referential integrity, ....
 
-![likelihood.png](img/assisgnment_2/likelihood.png)
+<img src="img/assisgnment_2/likelihood.png" alt="likelihood" style="width:60%;height:60%;"/>
 
 Marking new purchases
 
-![new_purchase.png](img/assisgnment_2/new_purchase.png)
+<img src="img/assisgnment_2/new_purchase.png" alt="New_purchase" style="width:60%;height:60%;"/>
 
 Calculating the total revenue for active products on 01/10/2019
 
-![revenue.png](img/assisgnment_2/revenue.png)
+<img src="img/assisgnment_2/revenue.png" alt="Revenue" style="width:50%;height:50%;"/>
 
 ## Bonus
 
@@ -120,7 +124,7 @@ and another to insert a new exchange rate (```POST/exchange_rates```).
 
 Starting DB
 ```sh
-docker-compose up db --build
+docker-compose up db --build -d
 ```
 
 Make sure you have ingested the data:
@@ -132,10 +136,10 @@ PGPASSWORD='postgres' psql -h localhost -p 5432 -U postgres -d postgres -P pager
 Starting API
 
 ```sh
-docker-compose up api
+docker-compose up api  --build
 ```
 
-**WARNING: if you are using Apple Silicon, run this instead**:
+**⚠️ WARNING: if you are using Apple Silicon, run this instead**:
 
 ```sh
 DOCKER_DEFAULT_PLATFORM=linux/amd64 docker-compose up api --build
@@ -148,26 +152,23 @@ curl -s -X GET "http://127.0.0.1:8000/exchange_rates/?conversion_date=2019-12-05
 ```
 
 Output:
-![api_get_exchange_rate.png](img/assisgnment_1/api_get_exchange_rate.png)
+
+<img src="img/assisgnment_1/api_get_exchange_rate.png" alt="Revenue" style="width:50%;height:50%;"/>
+
 
 ```sh
 curl -s -X POST "http://127.0.0.1:8000/exchange_rates/" -H "Content-Type: application/json" -d '{
-    "conversion_date": "2024-08-21",
-    "source_currency_key": 26,
-    "destination_currency_key": 72,
-    "source_destination_exchrate": 0.85
+"conversion_date": "2024-08-21",
+"source_currency_key": 26,
+"destination_currency_key": 72,
+"source_destination_exchrate": 0.85
 }'
 ```
 
 Output:
 
-![api_post_exchange_rate.png](img/assisgnment_1/api_post_exchange_rate.png)
+<img src="img/assisgnment_1/api_post_exchange_rate.png" alt="Revenue" style="width:50%;height:50%;"/>
 
-To stop all
-
-```sh
-docker-compose down
-```
 
 ## Cleaning up
 
@@ -176,7 +177,6 @@ docker-compose down
 ```
 
 ```sh
-docker rm assignmentsexchangeapi postgresbrndb --force
-docker rmi assignmentsexchangeapi postgres 
+docker rmi assignments-exchange-api postgres
 ```
 
