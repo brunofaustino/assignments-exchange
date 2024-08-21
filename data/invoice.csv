@@ -38071,7 +38071,7 @@ INVOICEID,USERID,TYPE,RELID,DESCRIPTION,AMOUNT,DUEDATE,INVOICE_LABEL
 1127856,70546,Hosting,562441,Level 1 Dedicated Server,2.02,01/04/2018 00:00:00,
 1127938,88630,Hosting,573216,Website Builder,7.95,08/04/2018 00:00:00,
 1127857,86583,Hosting,571794,Cloud Lite Plus,4.59,01/04/2018 00:00:00,
-1129083,58098,DomainAddonIDP,104916,Addons (ID Privacy Protection, this will stop your personal details from being displayed in the public whois database.),4.95,16/03/2018 00:00:00,
+1129083,58098,DomainAddonIDP,104916,Addons (ID Privacy Protection this will stop your personal details from being displayed in the public whois database.),4.95,16/03/2018 00:00:00,
 1129108,85463,Hosting,572984,Cloud Lite Plus,4.59,16/04/2018 00:00:00,
 1129109,85247,Hosting,570684,Cloud Lite Plus,4.59,16/04/2018 00:00:00,
 1129110,87784,Hosting,572985,Cloud Lite Plus,4.59,16/04/2018 00:00:00,
