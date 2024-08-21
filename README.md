@@ -2,6 +2,7 @@
 
 - [Docker](https://www.docker.com/)
 - [psql](https://www.postgresql.org/docs/current/app-psql.html)
+- [Docker-compose](https://docs.docker.com/compose/install/)
 
 ## Setup
 
