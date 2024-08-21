@@ -1,4 +1,4 @@
-## Requiriments
+## Requirements
 
 - [Docker](https://www.docker.com/)
 - [psql](https://www.postgresql.org/docs/current/app-psql.html)
@@ -8,11 +8,11 @@
 After clone this repository, you can run the following commands to start the database.
 
 ```sh
-docker build -t postgresdb .
+docker build -t postgresbrndb .
 ```
 
 ```sh
-docker run --name postgresdb -v $(pwd)/data:/data -e POSTGRES_PASSWORD=postgres -p 5432:5432 -d postgres 
+docker run --name postgresbrndb -v $(pwd)/data:/data -e POSTGRES_PASSWORD=postgres -p 5432:5432 -d postgres 
 ```
 
 ## Running
