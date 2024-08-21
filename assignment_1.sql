@@ -1,18 +1,16 @@
-DROP TABLE IF EXISTS currency_d;
 DROP TABLE IF EXISTS currency_conversion_f;
+DROP TABLE IF EXISTS currency_d;
 
 --#####################################################################################################
 -- 1. DDLs Creating Tables
 --#####################################################################################################
 
--- currency_d table
 CREATE TABLE currency_d (
     currency_key INT PRIMARY KEY,
     currency_code CHAR(3) NOT NULL,
     currency_name VARCHAR(200),
     currency_symbol CHAR(4));
 
--- currency_conversion_f table
 CREATE TABLE currency_conversion_f (
     conversion_date DATE NOT NULL,
     source_currency_key INT NOT NULL,
@@ -32,12 +30,16 @@ CREATE TABLE currency_conversion_f (
 -- 2. ETL Script for Loading CSV Data
 --#####################################################################################################
 
--- load currency_d
+\echo '================================================================================================================'
+\echo 'Importing data from CSV files:\n'
+
 COPY currency_d(currency_key, currency_code, currency_name, currency_symbol)
 FROM '/data/currency_d.csv' DELIMITER ',' CSV HEADER;
 
--- currency_conversion_f
-COPY currency_conversion_f(conversion_date, source_currency_key, destination_currency_key, source_destination_exchrate, destination_source_exchrate, source_destination_month_avg, destination_source_month_avg, source_destination_year_avg, destination_source_year_avg, exchgrates_source)
+COPY currency_conversion_f(conversion_date, source_currency_key, destination_currency_key,
+                           source_destination_exchrate, destination_source_exchrate, source_destination_month_avg,
+                           destination_source_month_avg, source_destination_year_avg,
+                           destination_source_year_avg, exchgrates_source)
 FROM '/data/currency_conversion_f.csv' DELIMITER ',' CSV HEADER;
 
 --#####################################################################################################
@@ -45,9 +47,9 @@ FROM '/data/currency_conversion_f.csv' DELIMITER ',' CSV HEADER;
 -- and saved also the exchange rate from currency 2 to currency 1.
 --#####################################################################################################
 
-UPDATE currency_conversion_f
-    SET destination_source_exchrate = 1.0 / source_destination_exchrate
-    WHERE destination_source_exchrate IS NULL;
+-- UPDATE currency_conversion_f
+--   SET destination_source_exchrate = 1.0 / source_destination_exchrate
+--    WHERE destination_source_exchrate IS NULL;
 
 -- Saves data in all formats present in currency_conversion_F.
 INSERT INTO currency_conversion_f (
@@ -75,6 +77,14 @@ SELECT
     exchgrates_source
 FROM currency_conversion_f;
 
+------------------------------------------------------------------------------------
+-- VALIDATION
+
+\echo '================================================================================================================'
+\echo 'Saved exchange rates from currency 1 to currency 2 and currency 2 to currency 1:\n'
+
+SELECT * FROM currency_conversion_f LIMIT 100;
+
 ----------
 -- We want to develop a SQL script which allows an external application to save in the table currency_conversion_F the
 -- exchange rates from pound to €, and from $ to € (GBP->EUR e USD-> EUR)
@@ -99,6 +109,14 @@ VALUES
     -- USD (72) -> EUR (26)
     ('2024-08-20', 72, 26, 0.85, 1/0.85, NULL, NULL, NULL, NULL, 'EXTERNAL_APP'),
     ('2024-08-20', 26, 72, 1.0/0.85, 0.85, NULL, NULL, NULL, NULL, 'EXTERNAL_APP');
+
+------------------------------------------------------------------------------------
+-- VALIDATION
+
+\echo '================================================================================================================'
+\echo 'Simulated the insertion of data from an external application, and exchange rates from pound to €, and from $ to € (GBP->EUR e USD-> EUR)\n'
+
+SELECT * FROM currency_conversion_f WHERE exchgrates_source = 'EXTERNAL_APP' LIMIT 100;
 
 --#####################################################################################################
 -- 3.2 Given an amount, a date, and the pair (currency 1, currency 2), converts amount from currency 1
@@ -137,8 +155,11 @@ SELECT convert_currency(
        72
 ) AS converted_amount;
 
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- VALIDATION
+
+\echo '================================================================================================================'
+\echo 'Check the exchange rate for EUR to USD on 2024-08-22 by manual calculation:\n'
 
 -- Check the exchange rate for EUR to USD on 2024-08-22 by manual calculation
 SELECT
@@ -163,11 +184,6 @@ LIMIT 10;
 -- 3.3 In presence of DML operations on currency_conversion_F, updates mean monthly and mean yearly values of
 -- exchange rates wherever present.|
 --#####################################################################################################
-
-SELECT
-     EXTRACT('DAY' FROM conversion_date) AS month,
-     conversion_date
-FROM currency_conversion_f LIMIT 10;
 
 -- Encapsulate the logic to update monthly and yearly averages in functions because we will use them multiple times
 -- to update the monthly and yearly averages for both source > destination and destination > source exchange rates.
@@ -281,8 +297,11 @@ SELECT update_avg_exchrate('year', 'destination_source');
 SELECT update_avg_exchrate('month', 'source_destination');
 SELECT update_avg_exchrate('month', 'destination_source');
 
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- VALIDATION
+
+\echo '================================================================================================================'
+\echo 'CHECK MONTH: Check the monthly SOURCE > DESTINATION average for EUR to USD on 2019-12:\n'
 
 -- CHECK MONTH: Check the monthly SOURCE > DESTINATION average for EUR to USD on 2019-12
 SELECT
@@ -304,6 +323,9 @@ GROUP BY
     EXTRACT('YEAR' FROM conversion_date),
     source_destination_month_avg;
 
+\echo '================================================================================================================'
+\echo 'CHECK MONTH: Check the monthly DESTINATION > SOURCE average for EUR to USD on 2019-12:\n'
+
 -- CHECK MONTH: Check the monthly DESTINATION > SOURCE average for EUR to USD on 2019-12
 SELECT
     source_currency_key,
@@ -324,6 +346,9 @@ GROUP BY
     EXTRACT('YEAR' FROM conversion_date),
     destination_source_exchrate;
 
+\echo '================================================================================================================'
+\echo 'CHECK YEAR: Check the yearly SOURCE > DESTINATION average for EUR to USD on 2019-12:\n'
+
 -- CHECK YEAR: Check the yearly SOURCE > DESTINATION average for EUR to USD on 2019-12
 SELECT
     source_currency_key,
@@ -341,6 +366,10 @@ GROUP BY
     EXTRACT('YEAR' FROM conversion_date),
     source_destination_year_avg;
 
+
+\echo '================================================================================================================'
+\echo 'CHECK YEAR: Check the yearly DESTINATION > SOURCE average for EUR to USD on 2019-12:\n'
+
 -- CHECK YEAR: Check the yearly DESTINATION > SOURCE average for EUR to USD on 2019-12
 SELECT
     source_currency_key,
@@ -357,3 +386,11 @@ GROUP BY
     destination_currency_key,
     EXTRACT('YEAR' FROM conversion_date),
     destination_source_exchrate;
+
+
+\echo '================================================================================================================'
+\echo 'Showing final results:\n'
+
+SELECT * FROM currency_conversion_f LIMIT 5;
+
+\echo 'Execution completed.'
