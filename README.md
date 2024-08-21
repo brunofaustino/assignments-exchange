@@ -1,7 +1,7 @@
 ## Requiriments
 
-Docker
-psql
+- [Docker](https://www.docker.com/)
+- [psql](https://www.postgresql.org/docs/current/app-psql.html)
 
 ## Setup
 
@@ -14,6 +14,12 @@ docker build -t postgresdb .
 ```sh
 docker run --name postgresdb -v $(pwd)/data:/data -e POSTGRES_PASSWORD=postgres -p 5432:5432 -d postgres 
 ```
+
+## Running
+
+The main sql scripts are: [assignment_1.sql](assignment_1.sql) and [assignment_2.sql](assignment_2.sql).
+Check them out to see the whole logic. 
+But you can also run the following to see some main outputs:  
 
 ### Assignment 1
 
@@ -41,9 +47,9 @@ Checking table results
 PGPASSWORD='postgres' psql -h localhost -p 5432 -U postgres -d postgres -c "SELECT * FROM currency_conversion_f LIMIT 5;"
 ```
 
-
-
 # Outputs
+
+Besides that, here is some evidence of it running:
 
 ## Assignment 1
 
